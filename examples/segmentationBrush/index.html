@@ -120,14 +120,14 @@ is used by our example image loader-->
   });
 
   var $drawEraseButton = $('#drawErase');
-
+  let drawValue = 1;
   $drawEraseButton.click(function () {
     var configuration = cornerstoneTools[toolType].getConfiguration();
     if (configuration.draw == 0) {
-      configuration.draw = 1;
+      configuration.draw = drawValue;
       $drawEraseButton.text("Erase");
     } else {
-      configuration.draw = 0;
+      configuration.draw = drawValue;
       $drawEraseButton.text("Draw");
     }
     cornerstoneTools[toolType].setConfiguration(configuration);
@@ -145,9 +145,15 @@ is used by our example image loader-->
   var $toolType = $('#toolType');
   $toolType.on('change', function(){
     toolType = $toolType.val();
-    cornerstoneTools.brush.disable(element);
+    cornerstoneTools.brush.deactivate(element);
     cornerstoneTools.adaptiveBrush.deactivate(element);
 
+    var configuration = cornerstoneTools[toolType].getConfiguration();
+    var radius = $radiusSlider.val();
+    configuration.radius = parseInt(radius, 10);
+    configuration.draw = drawValue;
+    cornerstoneTools[toolType].setConfiguration(configuration);
+    
     cornerstoneTools[toolType].activate(element, 1);
   });
 </script>

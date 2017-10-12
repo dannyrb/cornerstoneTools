@@ -7,12 +7,9 @@ const toolType = 'adaptiveBrush';
 const configuration = {
   draw: 1,
   radius: 3,
-  tolerance: 50,
+  tolerance: 5,
   border: 1,
-  minRadius: 1,
-  hoverColor: 'green',
-  dragColor: 'yellow',
-  overlayColor: 'red'
+  minRadius: 1
 };
 
 let lastImageCoords;

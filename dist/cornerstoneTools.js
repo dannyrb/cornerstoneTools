@@ -722,6 +722,10 @@ exports.default = function (mouseToolInterface) {
       _externalModules.external.$(element).on('CornerstoneToolsMouseDoubleClick', eventData, mouseToolInterface.mouseDoubleClickCallback);
     }
 
+    if (mouseToolInterface.deactivate) {
+      mouseToolInterface.deactivate(element, mouseButtonMask);
+    }
+
     _externalModules.external.cornerstone.updateImage(element);
   }
 
@@ -4615,10 +4619,18 @@ exports.default = function (brushToolInterface) {
     _externalModules.external.cornerstone.updateImage(element);
   }
 
+  function deactivate(element) {
+    _externalModules.external.$(element).off('CornerstoneImageRendered', brushToolInterface.onImageRendered);
+    _externalModules.external.$(element).off('CornerstoneToolsMouseDownActivate', mouseDownActivateCallback);
+    _externalModules.external.$(element).off('CornerstoneToolsMouseMove', mouseMoveCallback);
+    _externalModules.external.$(element).off('CornerstoneNewImage', newImageCallback);
+  }
+
   var brushTool = (0, _mouseButtonTool2.default)({
     mouseMoveCallback: mouseMoveCallback,
     mouseDownActivateCallback: mouseDownActivateCallback,
-    onImageRendered: brushToolInterface.onImageRendered
+    onImageRendered: brushToolInterface.onImageRendered,
+    deactivate: deactivate
   });
 
   brushTool.activate = activate;
@@ -15928,12 +15940,9 @@ var toolType = 'adaptiveBrush';
 var configuration = {
   draw: 1,
   radius: 3,
-  tolerance: 50,
+  tolerance: 5,
   border: 1,
-  minRadius: 1,
-  hoverColor: 'green',
-  dragColor: 'yellow',
-  overlayColor: 'red'
+  minRadius: 1
 };
 
 var lastImageCoords = void 0;

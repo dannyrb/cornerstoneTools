@@ -140,10 +140,18 @@ export default function (brushToolInterface) {
     external.cornerstone.updateImage(element);
   }
 
+  function deactivate (element) {
+    external.$(element).off('CornerstoneImageRendered', brushToolInterface.onImageRendered);
+    external.$(element).off('CornerstoneToolsMouseDownActivate', mouseDownActivateCallback);
+    external.$(element).off('CornerstoneToolsMouseMove', mouseMoveCallback);
+    external.$(element).off('CornerstoneNewImage', newImageCallback);
+  }
+
   const brushTool = mouseButtonTool({
     mouseMoveCallback,
     mouseDownActivateCallback,
-    onImageRendered: brushToolInterface.onImageRendered
+    onImageRendered: brushToolInterface.onImageRendered,
+    deactivate
   });
 
   brushTool.activate = activate;
