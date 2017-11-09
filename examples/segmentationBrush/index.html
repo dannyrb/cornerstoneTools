@@ -47,10 +47,17 @@
         <div class="row">
           <button id="drawErase" class="btn btn-primary">Erase</button>
         </div>
+        <div class="row">
+            <label for="toolType">Type</label>
+            <select id="toolType" style="width:100%">
+                <option value="brush">Default</option>
+                <option value="adaptiveBrush">Adaptive</option>
+            </select>
+        </div>
         
         <div class="row">
           <label for="radiusSlider">Radius: <span id="valBox">3</span>px</label>
-          <input id="radiusSlider" type="range" min="1" max="10" value="3" steps="1" style="width: 200px"/>
+          <input id="radiusSlider" type="range" min="1" max="20" value="20" steps="1" style="width: 200px"/>
         </div>
       </div>
     </div>
@@ -70,20 +77,22 @@ is used by our example image loader-->
 <script src="../../dist/cornerstoneTools.js"></script>
 
 <!-- include special code for these examples which provides images -->
-<script src="../exampleImageLoader.js"></script>
+<script src="../petctImageIdLoader.js"></script>
 
 <script>
-  var radius = 3;
+  var $radiusSlider = $('#radiusSlider');
+  var radius = $radiusSlider.val();
   var element = document.getElementById('dicomImage');
 
   var configuration = cornerstoneTools.brush.getConfiguration();
   configuration.radius = radius;
 
+  var toolType = 'brush';
   cornerstoneTools.brush.setConfiguration(configuration);
 
   var imageIds = [
-      'example://1',
-      'example://2',
+      'ct://1',
+      'ct://2',
   ];
 
   var stack = {
@@ -95,6 +104,9 @@ is used by our example image loader-->
   cornerstone.loadImage(imageIds[0]).then(function(image) {
     cornerstone.addLayer(element, image);
     cornerstone.updateImage(element);
+    var viewport = cornerstone.getViewport(element);
+    viewport.pixelReplication = true;
+    cornerstone.setViewport(element, viewport);
 
     cornerstoneTools.addStackStateManager(element, ['stack']);
     cornerstoneTools.addToolState(element, 'stack', stack);
@@ -104,13 +116,13 @@ is used by our example image loader-->
     cornerstoneTools.stackScrollWheel.activate(element);
     cornerstoneTools.pan.activate(element, 2);
     cornerstoneTools.zoom.activate(element, 4);    
-    cornerstoneTools.brush.activate(element, 1);     
+    cornerstoneTools[toolType].activate(element, 1);
   });
 
   var $drawEraseButton = $('#drawErase');
 
   $drawEraseButton.click(function () {
-    var configuration = cornerstoneTools.brush.getConfiguration();
+    var configuration = cornerstoneTools[toolType].getConfiguration();
     if (configuration.draw == 0) {
       configuration.draw = 1;
       $drawEraseButton.text("Erase");
@@ -118,15 +130,25 @@ is used by our example image loader-->
       configuration.draw = 0;
       $drawEraseButton.text("Draw");
     }
-    cornerstoneTools.brush.setConfiguration(configuration);
+    cornerstoneTools[toolType].setConfiguration(configuration);
   });
   
   var $radiusSlider = $('#radiusSlider');
   $radiusSlider.on('input', function(){
+    var configuration = cornerstoneTools[toolType].getConfiguration();
     var radius = $radiusSlider.val();
     $('#valBox').text(radius);
-    configuration.radius = radius;
-    cornerstoneTools.brush.setConfiguration(configuration);
+    configuration.radius = parseInt(radius, 10);
+    cornerstoneTools[toolType].setConfiguration(configuration);
+  });
+
+  var $toolType = $('#toolType');
+  $toolType.on('change', function(){
+    toolType = $toolType.val();
+    cornerstoneTools.brush.disable(element);
+    cornerstoneTools.adaptiveBrush.deactivate(element);
+
+    cornerstoneTools[toolType].activate(element, 1);
   });
 </script>
 </html>
